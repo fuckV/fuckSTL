@@ -208,6 +208,51 @@ namespace alpaca
 	struct is_same<_T, _T> : public true_type{};
 
 	//make_signed/unsigned
+#ifdef FAST_IMP
+	//Î´Ö§³Öwchar_t,char
+	template<class _T> struct make_signed { typedef _T type; };
+	template<> struct make_signed <unsigned char> { typedef signed char type; };
+	template<> struct make_signed <const unsigned char> { typedef const signed char type; };
+	template<> struct make_signed <volatile unsigned char> { typedef volatile signed char type; };
+	template<> struct make_signed <const volatile unsigned char> { typedef const volatile signed char type; };
+	template<> struct make_signed <unsigned short> { typedef signed short type; };
+	template<> struct make_signed <const unsigned short> { typedef const signed short type; };
+	template<> struct make_signed <volatile unsigned short> { typedef volatile signed short type; };
+	template<> struct make_signed <const volatile unsigned short> { typedef const volatile signed short type; };
+	template<> struct make_signed <unsigned int> { typedef signed int type; };
+	template<> struct make_signed <const unsigned int> { typedef const signed int type; };
+	template<> struct make_signed <volatile unsigned int> { typedef volatile signed int type; };
+	template<> struct make_signed <const volatile unsigned int> { typedef const volatile signed int type; };
+	template<> struct make_signed <unsigned long> { typedef signed long type; };
+	template<> struct make_signed <const unsigned long> { typedef const signed long type; };
+	template<> struct make_signed <volatile unsigned long> { typedef volatile signed long type; };
+	template<> struct make_signed <const volatile unsigned long> { typedef const volatile signed long type; };
+	template<> struct make_signed <unsigned long long> { typedef signed long long type; };
+	template<> struct make_signed <const unsigned long long> { typedef const signed long long type; };
+	template<> struct make_signed <volatile unsigned long long> { typedef volatile signed long long type; };
+	template<> struct make_signed <const volatile unsigned long long> { typedef const volatile signed long long type; };
+	template<class _T> struct make_unsigned { typedef _T type; };
+	template<> struct make_unsigned <signed char> { typedef unsigned char type; };
+	template<> struct make_unsigned <const signed char> { typedef const unsigned char type; };
+	template<> struct make_unsigned <volatile signed char> { typedef volatile unsigned char type; };
+	template<> struct make_unsigned <const volatile signed char> { typedef const volatile unsigned char type; };
+	template<> struct make_unsigned <signed short> { typedef unsigned short type; };
+	template<> struct make_unsigned <const signed short> { typedef const unsigned short type; };
+	template<> struct make_unsigned <volatile signed short> { typedef volatile unsigned short type; };
+	template<> struct make_unsigned <const volatile signed short> { typedef const volatile unsigned short type; };
+	template<> struct make_unsigned <signed int> { typedef unsigned int type; };
+	template<> struct make_unsigned <const signed int> { typedef const unsigned int type; };
+	template<> struct make_unsigned <volatile signed int> { typedef volatile unsigned int type; };
+	template<> struct make_unsigned <const volatile signed int> { typedef const volatile unsigned int type; };
+	template<> struct make_unsigned <signed long> { typedef unsigned long type; };
+	template<> struct make_unsigned <const signed long> { typedef const unsigned long type; };
+	template<> struct make_unsigned <volatile signed long> { typedef volatile unsigned long type; };
+	template<> struct make_unsigned <const volatile signed long> { typedef const volatile unsigned long type; };
+	template<> struct make_unsigned <signed long long> { typedef unsigned long long type; };
+	template<> struct make_unsigned <const signed long long> { typedef const unsigned long long type; };
+	template<> struct make_unsigned <volatile signed long long> { typedef volatile unsigned long long type; };
+	template<> struct make_unsigned <const volatile signed long long> { typedef const volatile unsigned long long type; };
+#else
 	namespace _Change_sign_imp{
 		template<class _T>
 		struct _Change_sign{
@@ -265,6 +310,7 @@ namespace alpaca
 	struct make_signed{ typedef typename _Change_sign_imp::_Change_sign<_T>::_Signed type; };
 	template<class _T>
 	struct make_unsigned{ typedef typename _Change_sign_imp::_Change_sign<_T>::_Unsigned type; };
+#endif
 
 	//conjunction
 	namespace _Conjunction_imp{
@@ -301,4 +347,28 @@ namespace alpaca
 	//negation
 	template<class _T>
 	struct negation : bool_constant<!bool(_T::value)> { };
+
+	//is_void
+	namespace _Is_void_imp
+	{
+		template<class _T>
+		struct _Is_void : public false_type{};
+		template<>
+		struct _Is_void<void> : public true_type{};
+	}
+	template<class _T>
+	struct is_void : public _Is_void_imp::_Is_void<typename remove_cv<_T>::type>{};
+
+	//is_union
+#ifdef _MSC_VER
+	template<class _T>
+	struct is_union : public bool_constant<__is_union(_T)> {};
+#else
+	namespace _Is_union_imp{
+		template<class _T>
+		struct _Is_union : public false_type{};
+	}
+	template<class _T>
+	struct is_union : public _Is_union_imp::_Is_union<typename remove_cv<_T>::type>{};
+#endif
 }

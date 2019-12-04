@@ -1,6 +1,18 @@
 #include"type_traits"
 template<class T>
 void f(T a, typename alpaca::type_identity<T>::type b){};
+
+struct A {};
+
+typedef union {
+	int a;
+	float b;
+} B;
+
+struct C {
+	B d;
+};
+
 void test_type_identity()
 {
 	f(1.0, 1);
@@ -36,4 +48,12 @@ void test_remove_cv()
 	//从 const volatile int * 移除 const/volatile 不修改该类型，因为该指针自身既非 const 亦非 volatile 
 	static_assert(alpaca::is_same<const volatile int*, type4>::value, "fail type4");
 	static_assert(alpaca::is_same<int*, type5>::value, "fail type5");
+}
+
+void test_is_union()
+{
+	static_assert(!alpaca::is_union<A>::value, "fail A");
+	static_assert(alpaca::is_union<B>::value, "fail B");
+	static_assert(!alpaca::is_union<C>::value, "fail C");
+	static_assert(!alpaca::is_union<int>::value, "fail int");
 }
